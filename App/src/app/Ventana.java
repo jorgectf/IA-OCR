@@ -5,6 +5,7 @@ import java.awt.Desktop;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -65,54 +66,60 @@ public class Ventana extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jFileChooser1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileChooser1ActionPerformed
-        //Archivo
-        File archivo = jFileChooser1.getSelectedFile();
-        String ruta = archivo.getAbsolutePath();
-        //Salida
-        String[] opciones = new String[]{"TEXTO PLANO", "PDF", "RTF"};
-        int respuesta;
-        respuesta = JOptionPane.showOptionDialog(rootPane, "Desea un pdf o un rtf?", "Formato de salida",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
-        //OCR
-        Ocr.setUp();
-        Ocr ocr = new Ocr();
-        ocr.startEngine("spa", Ocr.SPEED_SLOW);
-        switch (respuesta) {
-            case 0:
-                String texto = ocr.recognize(new File[]{new File(ruta)}, Ocr.RECOGNIZE_TYPE_ALL, Ocr.OUTPUT_FORMAT_PLAINTEXT);
-                JOptionPane.showMessageDialog(rootPane, texto, "Resultado", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 1:
-                ocr.recognize(new File[]{new File(ruta)}, Ocr.RECOGNIZE_TYPE_ALL,
-                        Ocr.OUTPUT_FORMAT_PDF,
-                        Ocr.PROP_PDF_OUTPUT_FILE, "resultado.pdf",
-                        Ocr.PROP_PDF_OUTPUT_TEXT_VISIBLE, true);
-                //Abrir automaticamente PDF si es soportado
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        File myFile = new File("resultado.pdf");
-                        Desktop.getDesktop().open(myFile);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(rootPane, "No se encontró un programa para abrir PDF", "Error", JOptionPane.ERROR_MESSAGE);
+        String accion = evt.getActionCommand();
+        if (accion.equals(JFileChooser.APPROVE_SELECTION)) {
+            //Aceptar
+            //Archivo
+            File archivo = jFileChooser1.getSelectedFile();
+            String ruta = archivo.getAbsolutePath();
+            //Salida
+            String[] opciones = new String[]{"TEXTO PLANO", "PDF", "RTF"};
+            int respuesta;
+            respuesta = JOptionPane.showOptionDialog(rootPane, "Desea un pdf o un rtf?", "Formato de salida",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+            //OCR
+            Ocr.setUp();
+            Ocr ocr = new Ocr();
+            ocr.startEngine("spa", Ocr.SPEED_FAST);
+            switch (respuesta) {
+                case 0:
+                    String texto = ocr.recognize(new File[]{new File(ruta)}, Ocr.RECOGNIZE_TYPE_ALL, Ocr.OUTPUT_FORMAT_PLAINTEXT);
+                    JOptionPane.showMessageDialog(rootPane, texto, "Resultado", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case 1:
+                    ocr.recognize(new File[]{new File(ruta)}, Ocr.RECOGNIZE_TYPE_ALL,
+                            Ocr.OUTPUT_FORMAT_PDF,
+                            Ocr.PROP_PDF_OUTPUT_FILE, "resultado.pdf",
+                            Ocr.PROP_PDF_OUTPUT_TEXT_VISIBLE, true);
+                    //Abrir automaticamente PDF si es soportado
+                    if (Desktop.isDesktopSupported()) {
+                        try {
+                            File myFile = new File("resultado.pdf");
+                            Desktop.getDesktop().open(myFile);
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(rootPane, "No se encontró un programa para abrir PDF", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
-                }
-                break;
-            case 2:
-                ocr.recognize(new File[]{new File(ruta)},
-                        Ocr.RECOGNIZE_TYPE_ALL, Ocr.OUTPUT_FORMAT_RTF,
-                        "PROP_RTF_OUTPUT_FILE=resultado.rtf");
-                //Abrir automaticamente RTF si es soportado
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        File myFile = new File("resultado.rtf");
-                        Desktop.getDesktop().open(myFile);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(rootPane, "No se encontró un programa para abrir RTF", "Error", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case 2:
+                    ocr.recognize(new File[]{new File(ruta)},
+                            Ocr.RECOGNIZE_TYPE_ALL, Ocr.OUTPUT_FORMAT_RTF,
+                            "PROP_RTF_OUTPUT_FILE=resultado.rtf");
+                    //Abrir automaticamente RTF si es soportado
+                    if (Desktop.isDesktopSupported()) {
+                        try {
+                            File myFile = new File("resultado.rtf");
+                            Desktop.getDesktop().open(myFile);
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(rootPane, "No se encontró un programa para abrir RTF", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
-                }
-                break;
+                    break;
+            }
+            ocr.stopEngine();
+        } else if (accion.equals(JFileChooser.CANCEL_SELECTION)) {
+            System.exit(0);
         }
-        ocr.stopEngine();
     }//GEN-LAST:event_jFileChooser1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
